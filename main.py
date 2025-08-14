@@ -12,6 +12,16 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # 在创建app之后添加
 app.middleware("http")(streaming_perf_middleware)
 

@@ -9,8 +9,7 @@ router = APIRouter()
 
 @router.get("/v1/models", dependencies=[Depends(validate_api_key)])
 async def list_models():
-    pass
-    # return OpenAIAdapter.list_models()
+    return OpenAIAdapter.list_models()
 
 
 @router.options("/v1/chat/completions")

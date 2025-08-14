@@ -13,7 +13,7 @@ def validate_api_key(authorization: str = Security(api_key_header)):
 
     if authorization.startswith("Bearer "):
         token = authorization.split("Bearer ")[1]
-        if token == settings.openai_api_key:
+        if token == settings.OPENAI_API_KEY:
             return True
 
     raise HTTPException(
