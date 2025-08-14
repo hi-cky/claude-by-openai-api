@@ -35,7 +35,7 @@ class ClaudeService:
         """流式调用Claude API"""
         if model not in self.available_models:
             model = settings.DEFAULT_MODEL
-        
+
 
         stream = await self.client.messages.create(
             model=model,

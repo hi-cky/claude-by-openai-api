@@ -26,7 +26,7 @@ class OpenAIAdapter:
         created_time = int(time.time())
         fingerprint = "fp_" + hex(int(time.time() * 1000))[2:]
 
-        try:             
+        try:
             stream = await claude_service.stream_complete(
                 **claude.Request.from_openai(request).model_dump()
             )
@@ -105,7 +105,7 @@ class OpenAIAdapter:
                                 ).model_dump_json()
 
                         current_content_block = None
-                        
+
             yield openai.StreamResponse(
                 id=response_id,
                 created=created_time,
