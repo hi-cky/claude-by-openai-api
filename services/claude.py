@@ -31,7 +31,13 @@ class ClaudeService:
         return response.content[0].text # type: ignore
 
 
-    async def stream_complete(self, model: str, messages: List[Dict], max_tokens=1000, temperature=0.7, tools: Optional[Iterable] = None):
+    async def stream_complete(self, 
+        model: str, 
+        messages: List[Dict], 
+        max_tokens=1000, 
+        temperature=0.7, 
+        tools: Optional[Iterable] = None
+    ) ->  anthropic.AsyncStream:
         """流式调用Claude API"""
         if model not in self.available_models:
             model = settings.DEFAULT_MODEL

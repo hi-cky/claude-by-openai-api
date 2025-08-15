@@ -22,4 +22,12 @@ class Settings(BaseSettings):
     RELOAD: bool = bool(os.getenv("RELOAD", True))
 
 settings = Settings()
-logger.info(f"Settings loaded: {settings}")
+logger.info(" === Configuration Loaded ===")
+logger.info(f" Host: {settings.HOST}:{settings.PORT}")
+logger.info(f" Default Model: {settings.DEFAULT_MODEL}")
+logger.info(f" Log Level: {settings.LOG_LEVEL}")
+logger.info(f" Reload: {settings.RELOAD}")
+logger.info(f" ANTHROPIC_BASE_URL: {settings.ANTHROPIC_BASE_URL}")
+logger.info(f" ANTHROPIC_API_KEY: {settings.ANTHROPIC_API_KEY}")
+logger.info(f" ANTHROPIC_AUTH_TOKEN: {settings.ANTHROPIC_AUTH_TOKEN}")
+logger.info(f" OPENAI_API_KEY: {settings.OPENAI_API_KEY}")

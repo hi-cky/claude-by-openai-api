@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends
-from schemas import openai
+from fastapi import APIRouter, Depends, HTTPException
+from schemas import openai, claude
 from dependencies import validate_api_key
 from services.openai_adapter import OpenAIAdapter
+from services.claude import claude_service
 from fastapi.responses import StreamingResponse, Response
 
 router = APIRouter()
@@ -24,28 +25,34 @@ async def handle_options():
         }
     )
 
+
 @router.post("/v1/chat/completions", dependencies=[Depends(validate_api_key)])
 async def create_chat_completion(request: openai.Request):
     """处理聊天完成请求（支持流式）"""
 
     # 非流式处理
     if not request.stream:
-        pass
-        
-    # 流式处理
-    async def event_stream():
-        async for chunk in OpenAIAdapter.create_chat_completion_stream(request): # type: ignore
-            # print("chunk:", chunk)
-            # 将数据格式化为SSE事件
-            yield f"data: {chunk}\n\n"
-        yield "data: [DONE]\n\n"
+        raise HTTPException(status_code=400, detail="Non-streaming requests are not supported.")
 
-    return StreamingResponse(
-        event_stream(),
-        media_type="text/event-stream",
-        headers={
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive',
-            'Transfer-Encoding': 'chunked'
-        }
-    )
+    try:
+        # 初始化阶段可能抛出的异常应该直接raise，让外层处理
+        claude_stream = await claude_service.stream_complete(
+            **claude.Request.from_openai(request)
+            .model_dump()
+        )
+        # 获取第一个 chunk 查看是否正常
+        first_chunk = await claude_stream.__anext__()
+        print(first_chunk)
+
+        return StreamingResponse(
+            OpenAIAdapter.create_openai_stream_from_claude(claude_stream, first_chunk.message.model),
+            media_type="text/event-stream",
+            headers={
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+                'Transfer-Encoding': 'chunked'
+            }
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
